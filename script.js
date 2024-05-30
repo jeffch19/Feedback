@@ -1,4 +1,6 @@
 //Global
+const MAX_CHARS = 150;
+
 const textareaEl = document.querySelector('.form__textarea');
 const counterEl = document.querySelector('.counter');
 const formEl = document.querySelector('.form');
@@ -8,7 +10,7 @@ const submitBtnEl = document.querySelector('.submit-btn');
 //-- Counter Component --
 const inputHandler = () => {
   //determine maximum number of chars
-  const maxNrChars = 150;
+  const maxNrChars = MAX_CHARS;
 
   //determine number of chars user currently typed
   const nrCharsTyped = textareaEl.value.length;
@@ -25,30 +27,29 @@ textareaEl.addEventListener('input', inputHandler);
 
 
 
-//Submit Component
+//Form Component
+const showVisualIndicator = textCheck => {
+  const className = textCheck === 'valid' ? 'form--valid' : 'form--invalid';
+  //show valid indicator
+  formEl.classList.add(className);
+
+  setTimeout(() => {
+    formEl.classList.remove(className);
+  }, 2000);
+}
+
 const submitHander = event => {
   //prevent default browser action (submitting form data to action address)
   event.preventDefault();
 
   //get text from text area
   const text = textareaEl.value;
-  
+
   //validate text (if # is present and text is long enough)
-  if (text.includes('#') && text.length > 4) {
-
-    //show valid indicator
-    formEl.classList.add('form--valid');
-
-    setTimeout( () => {
-      formEl.classList.remove('form--valid');
-    } , 2000)
+  if (text.includes('#') && text.length >= 5) {
+    showVisualIndicator('valid');
   } else {
-    //show invalid indicator
-    formEl.classList.add('form--invalid');
-
-    setTimeout( () => {
-      formEl.classList.remove('form--invalid');
-    } , 2000)
+    showVisualIndicator('invalid');
 
     //focus text area
     textareaEl.focus();
@@ -90,7 +91,7 @@ const submitHander = event => {
   //blur submit button
   submitBtnEl.blur();
   //reset counter
-  counterEl.textContent = '150';
+  counterEl.textContent = MAX_CHARS;
 }
 
 formEl.addEventListener('submit', submitHander)
