@@ -131,6 +131,36 @@ formEl.addEventListener('submit', submitHander)
 
 
 //Feedback List Component
+const clickHandler = event => {
+  const clickedEl = event.target;
+
+  //determine if user intended to upvote or expand
+  const upvoteIntention = clickedEl.className.includes("upvote");
+  //run appropriate logic
+  if (upvoteIntention) {
+    //get upvote button
+    const upVoteButtonEl = clickedEl.closest('.upvote')
+    //disable upvote button so user cant click multiple times
+    upVoteButtonEl.disabled = true;
+
+    //select the upvote count element within the upvote button
+    const upvoteCountEl = upVoteButtonEl.querySelector('.upvote__count');
+
+    //get currently displayed upvote count as a number (+)
+    let upvoteCount = +upvoteCountEl.textContent;
+
+    //set upvote count in HTML
+    upvoteCount.textContent = ++upvoteCount;
+
+
+  } else {
+    //expand clicked feedback item
+    clickedEl.closest('.feedback').classList.toggle('feedback--expand');
+  }
+}
+
+feedbackListEl.addEventListener('click', clickHandler)
+
 fetch(`${BASE_API_URL}/feedbacks`)
   .then(response => response.json())
   .then(data => {
@@ -138,7 +168,7 @@ fetch(`${BASE_API_URL}/feedbacks`)
     spinnerEl.remove();
     //iterate over each element in feedback array and render in list
     data.feedbacks.forEach(feedbackItem => {
-renderFeedbackItem(feedbackItem);
+      renderFeedbackItem(feedbackItem);
     });
   }).catch(error => {
     feedbackListEl.textContent = `Failed to fetch feedback items. Error Message: ${error.message}`
