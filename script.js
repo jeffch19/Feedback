@@ -1,5 +1,6 @@
 //Global
 const MAX_CHARS = 150;
+const BASE_API_URL = 'https://bytegrad.com/course-assets/js/1/api'
 
 const textareaEl = document.querySelector('.form__textarea');
 const counterEl = document.querySelector('.counter');
@@ -89,7 +90,7 @@ const submitHander = event => {
   const daysAgo = 0;
 
 
-  //create feeback item object
+  //render feedback item in list
   const feedbackItem = {
     upvoteCount: upvoteCount,
     company: company,
@@ -99,6 +100,24 @@ const submitHander = event => {
   };
   //render feedback item
   renderFeedbackItem(feedbackItem);
+
+  //send feedback item to server
+  fetch(`${BASE_API_URL}/feedbacks`, {
+    method: 'POST',
+    body: JSON.stringify(feedbackItem),
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    }
+  }).then(response => {
+    if (!response.ok) {
+      console.log('Something went wrong');
+      return;
+    } else {
+      console.log("Successfully Submitted");
+    }
+  }).catch(err => console.log(err));
+
 
   //clear textarea
   textareaEl.value = '';
@@ -112,7 +131,7 @@ formEl.addEventListener('submit', submitHander)
 
 
 //Feedback List Component
-fetch('https://bytegrad.com/course-assets/js/1/api/feedbacks')
+fetch(`${BASE_API_URL}/feedbacks`)
   .then(response => response.json())
   .then(data => {
     //remove spinner
