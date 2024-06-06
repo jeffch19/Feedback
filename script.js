@@ -8,6 +8,7 @@ const formEl = document.querySelector('.form');
 const feedbackListEl = document.querySelector('.feedbacks');
 const submitBtnEl = document.querySelector('.submit-btn');
 const spinnerEl = document.querySelector('.spinner');
+const hashtagListEl = document.querySelector('.hashtags');
 
 const renderFeedbackItem = feedbackItem => {
   const feedbackItemHTML = `
@@ -131,37 +132,38 @@ formEl.addEventListener('submit', submitHander)
 
 
 //Feedback List Component
-const clickHandler = event => {
-  const clickedEl = event.target;
-
-  //determine if user intended to upvote or expand
-  const upvoteIntention = clickedEl.className.includes("upvote");
-  //run appropriate logic
-  if (upvoteIntention) {
-    //get upvote button
-    const upVoteButtonEl = clickedEl.closest('.upvote')
-    //disable upvote button so user cant click multiple times
-    upVoteButtonEl.disabled = true;
-
-    //select the upvote count element within the upvote button
-    const upvoteCountEl = upVoteButtonEl.querySelector('.upvote__count');
-
-    //get currently displayed upvote count as a number (+)
-    let upvoteCount = +upvoteCountEl.textContent;
-
-    //set upvote count in HTML
-    upvoteCount.textContent = ++upvoteCount;
-
-
-  } else {
-    //expand clicked feedback item
-    clickedEl.closest('.feedback').classList.toggle('feedback--expand');
+(() => {
+  const clickHandler = event => {
+    const clickedEl = event.target;
+  
+    //determine if user intended to upvote or expand
+    const upvoteIntention = clickedEl.className.includes("upvote");
+    //run appropriate logic
+    if (upvoteIntention) {
+      //get upvote button
+      const upVoteButtonEl = clickedEl.closest('.upvote')
+      //disable upvote button so user cant click multiple times
+      upVoteButtonEl.disabled = true;
+  
+      //select the upvote count element within the upvote button
+      const upvoteCountEl = upVoteButtonEl.querySelector('.upvote__count');
+  
+      //get currently displayed upvote count as a number (+)
+      let upvoteCount = +upvoteCountEl.textContent;
+  
+      //set upvote count in HTML
+      upvoteCount.textContent = ++upvoteCount;
+  
+  
+    } else {
+      //expand clicked feedback item
+      clickedEl.closest('.feedback').classList.toggle('feedback--expand');
+    }
   }
-}
+  
+  feedbackListEl.addEventListener('click', clickHandler)
 
-feedbackListEl.addEventListener('click', clickHandler)
-
-fetch(`${BASE_API_URL}/feedbacks`)
+  fetch(`${BASE_API_URL}/feedbacks`)
   .then(response => response.json())
   .then(data => {
     //remove spinner
@@ -173,3 +175,39 @@ fetch(`${BASE_API_URL}/feedbacks`)
   }).catch(error => {
     feedbackListEl.textContent = `Failed to fetch feedback items. Error Message: ${error.message}`
   })
+})();
+
+
+
+
+
+  // last component Hashtag -----------
+  (() => {
+    const clickHandler = event => {
+      // Get the clicked element
+      const clickedEl = event.target;
+    
+      // Stop function if click happens in list, but outside buttons
+      if (clickedEl.className === 'hashtags') return;
+    
+      // Extract company name from the clicked hashtag
+      const companyNameFromHashtag = clickedEl.textContent.substring(1).toLowerCase().trim();
+    
+      // Iterate over each feedback item in the list
+      feedbackListEl.childNodes.forEach(childNode => {
+        // Stop this iteration if it's a text node
+        if (childNode.nodeType === 3) return;
+    
+        // Extract company name from the feedback item
+        const companyNameFromAFeedbackItem = childNode.querySelector('.feedback__company').textContent.toLowerCase().trim();
+    
+        // Now you can safely compare companyNameFromHashtag with companyNameFromAFeedbackItem
+        if (companyNameFromHashtag!== companyNameFromAFeedbackItem) {
+          childNode.remove(); // Remove the feedback item if the companies don't match
+        }
+      });
+    }
+    
+    // Attach the event listener to the correct element
+    hashtagListEl.addEventListener('click', clickHandler);
+  })();
