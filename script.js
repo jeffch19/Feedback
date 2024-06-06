@@ -126,9 +126,10 @@ const submitHander = event => {
   submitBtnEl.blur();
   //reset counter
   counterEl.textContent = MAX_CHARS;
+  formEl.addEventListener('submit', submitHander)
 }
 
-formEl.addEventListener('submit', submitHander)
+
 
 
 //Feedback List Component
